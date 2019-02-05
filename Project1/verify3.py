@@ -19,36 +19,7 @@ def ecdsa_verify(msg, pk, (r, s), curve=None, hash_fn=hashlib.sha256):
     # and doing point multiplication.
     # See https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm#Signature_verification_algorithm
     # for the algorithm.
-    #check pk != identity O
-    assert(pk.infinity == False)
-    #check pk is on curve
-    assert(curve.on_curve(pk.x,pk.y))
-    #check n*pk = O
-    assert(pk.mult(curve.n).infinity == True)
-    #verify r and s < n
-    assert(r < curve.n)
-    assert(s < curve.n)
-    #calc e=HASH(m)
-    e = hash_fn(msg).hexdigest()
-    #let z be Ln leftmost bits of e
-    z = int(bin(int(e,16))[:len(bin(curve.n))],2)
-    #print("e:",e,z)
-    #calc w = s^-1 % n
-    w = (1/s)%curve.n
-    #calc u1 = zw %n and u2 = rw%n
-    u1 = (z*w)%curve.n
-    u2 = (r*w)%curve.n
-    #calc curve point
-    curvpoint = pk.mult(u2)
-    curvpointG = curve.G().mult(u1)
-    curvpoint = curvpoint.add(curvpointG)
-    if(curvpoint.infinity == True):
-        return False
-    if(r == curvpoint.x): 
-        return True
-
-
-    
+    raise Exception('Not implemented!')
 
 
 if __name__ == '__main__':

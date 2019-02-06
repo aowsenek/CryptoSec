@@ -34,7 +34,6 @@ def ecdsa_verify(msg, pk, (r, s), curve=None, hash_fn=hashlib.sha256):
     z = int(bin(int(e,16))[:len(bin(curve.n))],2)
     #calc w = s^-1 % n
     w = ecdsa.modinv(s, curve.n)
-    #w = (1/s)%curve.n      #original calcuation of w
     #calc u1 = zw %n and u2 = rw%n
     u1 = (z*w)%curve.n
     u2 = (r*w)%curve.n
@@ -47,10 +46,6 @@ def ecdsa_verify(msg, pk, (r, s), curve=None, hash_fn=hashlib.sha256):
     if(r == curvpoint.x%curve.n): 
         return True
     return False
-
-
-    
-
 
 if __name__ == '__main__':
     import ecdsa
@@ -76,6 +71,11 @@ if __name__ == '__main__':
     # *******************************************************
     # TODO: Write your code for pairing messages to signatures here
 
+    #Calculates (j,k) of each x in sigs and compares it to i in msgs, prints if msg i pairs with signature x
+    for i in msgs:
+        for x in sigs:
+            if(ecdsa_verify(i, pk, ecdsa.decode_sig(x, bits=256), curve=None, hash_fn=hashlib.sha256) == True):
+                print i, x
 
     # *******************************************************
     # TODO: (Graduate students only, optional for undergrad)

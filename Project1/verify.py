@@ -55,7 +55,6 @@ def ecdsa_verify(msg, pk, (r, s), curve=None, hash_fn=hashlib.sha256):
     e = hash_fn(msg).hexdigest()
     #let z be Ln leftmost bits of e
     z = int(bin(int(e,16))[:len(bin(curve.n))],2)
-    #print("e:",e,z)
     #calc w = s^-1 % n
     w = modinv(s, curve.n)
     #w = (1/s)%curve.n      #original calcuation of w
@@ -70,6 +69,7 @@ def ecdsa_verify(msg, pk, (r, s), curve=None, hash_fn=hashlib.sha256):
         return False
     if(r == curvpoint.x%curve.n): 
         return True
+    return False
 
 
     

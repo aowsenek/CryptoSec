@@ -1,6 +1,29 @@
 #!/usr/bin/python
 
 import hashlib
+import math
+import os
+
+    #egcd and modinv copied from ecdsa.py
+def egcd(a, b):
+    '''extended greatest common denominator (GCD)
+    gcd is returned as first argument'''
+    if a == 0:
+        return (b, 0, 1)
+    else:
+        g, y, x = egcd(b % a, a)
+        return (g, x - (b // a) * y, y)
+
+def modinv(a, m):
+    '''
+    Modular inverse. Given a and m, returns a**-1 mod m
+    e.g. x*a mod m == 1, returns x
+    '''
+    g, x, y = egcd(a % m, m)
+    if g != 1:
+        raise Exception('modular inverse does not exist for %d, %d' % (a, m))
+    else:
+        return x % m
 
 def ecdsa_verify(msg, pk, (r, s), curve=None, hash_fn=hashlib.sha256):
     '''Verifies a signature on a message.
@@ -32,9 +55,9 @@ def ecdsa_verify(msg, pk, (r, s), curve=None, hash_fn=hashlib.sha256):
     e = hash_fn(msg).hexdigest()
     #let z be Ln leftmost bits of e
     z = int(bin(int(e,16))[:len(bin(curve.n))],2)
-    #print("e:",e,z)
     #calc w = s^-1 % n
-    w = (1/s)%curve.n
+    w = modinv(s, curve.n)
+    #w = (1/s)%curve.n      #original calcuation of w
     #calc u1 = zw %n and u2 = rw%n
     u1 = (z*w)%curve.n
     u2 = (r*w)%curve.n
@@ -44,8 +67,9 @@ def ecdsa_verify(msg, pk, (r, s), curve=None, hash_fn=hashlib.sha256):
     curvpoint = curvpoint.add(curvpointG)
     if(curvpoint.infinity == True):
         return False
-    if(r == curvpoint.x): 
+    if(r == curvpoint.x%curve.n): 
         return True
+    return False
 
 
     

@@ -21,6 +21,6 @@ while(not has6zeros(hash)):
     hash = hashlib.sha256(newstr).hexdigest()
     # if(num%100000 == 0): print(num)
 
-print("String:",newstr,"\n Hash:", hash)
+# print("String:",newstr,"\n Hash:", hash)
 
 # print time.clock() - start_time

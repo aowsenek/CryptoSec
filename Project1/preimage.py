@@ -2,7 +2,7 @@ import hashlib
 import random
 import time
 
-start_time = time.clock()
+# start_time = time.clock()
 
 def has6zeros(string):
     s = string[:6]
@@ -23,4 +23,4 @@ while(not has6zeros(hash)):
 
 print("String:",newstr,"\n Hash:", hash)
 
-print time.clock() - start_time
+# print time.clock() - start_time

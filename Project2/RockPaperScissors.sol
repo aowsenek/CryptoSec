@@ -8,13 +8,13 @@ of the pair. Note calls to this function occur offline
 If you leave the'pure'
 keyword in the function signature,
 function calls to this won't publish to the blockchain.*/
-address p1;
-address p2;
+address payable p1;
+address payable p2;
 bytes32 hashchoice1;
 bytes32 hashchoice2;
 string public choice1;
 string public choice2;
-address winner;
+address payable winner;
 bool resolved;
 bool p1played;
 uint wager;
@@ -49,7 +49,7 @@ they reveal their choice and blinding string.
 This function verifies the commitment is correct
 and after both players submit, determines the winner.
 */
-function whichRPS(string memory choice) public returns(uint){
+function whichRPS(string memory choice) private pure returns(uint){
     if(sha256(bytes(choice)) == sha256(bytes("rock"))){
         return 0;
     }
@@ -66,11 +66,11 @@ function reveal(string memory choice, string memory rand) public {
         assert(hashchoice1 == sha256(abi.encodePacked(sha256(bytes(choice))^sha256(bytes(rand)))));
         choice1 = choice;
     }
-    else{
+    else if (msg.sender == p2){
         assert(hashchoice2 == sha256(abi.encodePacked(sha256(bytes(choice))^sha256(bytes(rand)))));
         choice2 = choice;
     }
-    if(keccak256(choice1) != keccak256("") && keccak256(choice2) != keccak256("")){
+    if(bytes(choice1).length != 0 && bytes(choice2).length != 0){
         if(whichRPS(choice1) == 0){ //rock
             if(whichRPS(choice2) == 0){//rock
             }
@@ -110,13 +110,16 @@ to claim their reward (both wagers).
 In the event of a tie, this function should let
 each player withdraw their initial wager.
 */
-function withdraw() public { 
-    if(winner = 0 && resolved == true){
-        p1.send(wager);
-        p2.send(wager);
-    }
-    else if(resolved == true){
-        winner.send(wager*2);
-    }
+function withdraw() public {
+   if(resolved == true){
+       if(winner == p1 || winner == p2){
+           winner.transfer(wager*2);
+       }
+       else{
+       p1.transfer(wager);
+       p2.transfer(wager);
+       }
+   }
 }
 }
+

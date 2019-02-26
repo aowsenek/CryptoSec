@@ -16,19 +16,21 @@ string public choice1;
 string public choice2;
 address winner;
 bool resolved;
+bool p1played;
 uint wager;
 
 function encode_commitment(string memory choice, string memory rand) public pure returns (bytes32) { 
-    return sha256(sha256(choice)^sha256(rand));
+    return sha256(abi.encodePacked(sha256(bytes(choice))^sha256(bytes(rand))));
 
 }
 /* Accepts a commitment (generated via encode_commitment)
 and a wager of ethereum*/
 function play(bytes32 commitment) public payable { 
-    if(p1 == 0){
+    if(!p1played){
         p1 = msg.sender;
         hashchoice1 = commitment;
         wager = msg.value;
+        p1played = true;
     }
     else{
         p2 = msg.sender;
@@ -38,7 +40,7 @@ function play(bytes32 commitment) public payable {
         }
         else if(msg.value > wager){
             uint excess = msg.value - wager;
-            p2.send(excess); //probably won't work
+            msg.sender.transfer(excess); //probably won't work
         }
     }
 }
@@ -49,14 +51,14 @@ and after both players submit, determines the winner.
 */
 function reveal(string memory choice, string memory rand) public { 
     if(msg.sender == p1){
-        assert(hashchoice1 == sha256(sha256(choice)^sha256(rand)));
+        assert(hashchoice1 == sha256(abi.encodePacked(sha256(bytes(choice))^sha256(bytes(rand)))));
         choice1 = choice;
     }
     else{
-        assert(hashchoice2 == sha256(sha256(choice)^sha256(rand)));
+        assert(hashchoice2 == sha256(abi.encodePacked(sha256(bytes(choice))^sha256(bytes(rand)))));
         choice2 = choice;
     }
-    if(choice1 != 0 && choice2 != 0){
+    if(keccak256(choice1) != keccak256("") && keccak256(choice2) != keccak256("")){
         if(sha256(choice1) == sha256("rock")){
             if(sha256(choice2) ==  sha256("rock")){
                 winner = 0;

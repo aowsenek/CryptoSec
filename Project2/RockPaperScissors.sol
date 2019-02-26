@@ -49,6 +49,18 @@ they reveal their choice and blinding string.
 This function verifies the commitment is correct
 and after both players submit, determines the winner.
 */
+function whichRPS(string memory choice) public returns(uint){
+    if(sha256(bytes(choice)) == sha256(bytes("rock"))){
+        return 0;
+    }
+    if(sha256(bytes(choice)) == sha256(bytes("paper"))){
+        return 1;
+    }
+    if(sha256(bytes(choice)) == sha256(bytes("scissors"))){
+        return 2;
+    }
+}
+
 function reveal(string memory choice, string memory rand) public { 
     if(msg.sender == p1){
         assert(hashchoice1 == sha256(abi.encodePacked(sha256(bytes(choice))^sha256(bytes(rand)))));
@@ -59,37 +71,34 @@ function reveal(string memory choice, string memory rand) public {
         choice2 = choice;
     }
     if(keccak256(choice1) != keccak256("") && keccak256(choice2) != keccak256("")){
-        if(sha256(choice1) == sha256("rock")){
-            if(sha256(choice2) ==  sha256("rock")){
-                winner = 0;
+        if(whichRPS(choice1) == 0){ //rock
+            if(whichRPS(choice2) == 0){//rock
             }
-            else if(sha256(choice2) ==  sha256("paper")){
+            else if(whichRPS(choice2) == 1){//paper
                 winner = p2;
             }
-            else if(sha256(choice2) ==  sha256("scissors")){
+            else if(whichRPS(choice2) == 2){//scissors
                 winner = p1;
             }
         }
-        else if(sha256(choice1) == sha256("paper")){
-            if(sha256(choice2) ==  sha256("rock")){
+        else if(whichRPS(choice1) == 1){ //paper
+            if(whichRPS(choice2) == 0){//rock
                 winner = p1;
             }
-            else if(sha256(choice2) ==  sha256("paper")){
-                winner = 0;
+            else if(whichRPS(choice2) == 1){//paper
             }
-            else if(sha256(choice2) ==  sha256("scissors")){
+            else if(whichRPS(choice2) == 2){//scissors
                 winner = p2;
             }
         }
-        else if(sha256(choice1) == sha256("scissors")){
-            if(sha256(choice2) ==  sha256("rock")){
+        else if(whichRPS(choice1) == 2){ //scissors
+            if(whichRPS(choice2) == 0){//rock
                 winner = p2;
             }
-            else if(sha256(choice2) ==  sha256("paper")){
+            else if(whichRPS(choice2) == 1){//paper
                 winner = p1;
             }
-            else if(sha256(choice2) ==  sha256("scissors")){
-                winner = 0;
+            else if(whichRPS(choice2) == 2){//scissors
             }
         }
 
